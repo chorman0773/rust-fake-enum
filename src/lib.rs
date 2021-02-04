@@ -67,7 +67,7 @@ macro_rules! fake_enum{
             fn fmt(&self,f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result{
                 match self{
                     $(Self($expr) => f.write_str(::std::stringify!($item)),)*
-                    e => f.write_format(::std::format_args!("{}({})",))
+                    e => f.write_fmt(::core::format_args!("{}({})",::core::stringify!($name),e.0))
                 }
             }
         }
@@ -121,5 +121,28 @@ mod test {
         assert_eq!(unsafe { std::mem::transmute::<u16, ElfType>(2) }, ET_EXEC);
         assert_eq!(unsafe { std::mem::transmute::<u16, ElfType>(3) }, ET_DYN);
         assert_eq!(unsafe { std::mem::transmute::<u16, ElfType>(4) }, ET_CORE);
+    }
+
+    fake_enum! {
+        #[repr(u8)]
+        #[derive(Hash,Default)]
+        pub enum struct NbtTagType{
+            End = 0,
+            Byte = 1,
+            Short = 2,
+            Int = 3,
+            Long = 4,
+            Float = 5,
+            Double = 6,
+            ByteArray = 7,
+            String = 8,
+            List = 9,
+            Compound = 10,
+            IntArray = 11,
+            LongArray = 12,
+            FloatArray = 13,
+            DoubleArray = 14,
+            Uuid = 15
+        }
     }
 }
