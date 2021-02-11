@@ -31,16 +31,17 @@
 #[macro_export]
 macro_rules! fake_enum{
     {#[repr($t:ty)] $(#[$meta:meta])* $vis:vis enum $name:ident {
-        $($item:ident = $expr:literal),*$(,)?
+        $(#![$meta1:meta])*
+        $($(#[$r:meta])* $item:ident = $expr:literal),*$(,)?
     }} => {
-
 
         #[derive(Copy,Clone,Eq,PartialEq)]
         #[repr(transparent)]
         $(#[$meta])*
+        $(#[$meta1])*
         $vis struct $name($t);
 
-        $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $vis const $item: $name = $name($expr as $t);)*
+        $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $(#[$r])* $vis const $item: $name = $name($expr as $t);)*
 
         impl ::core::fmt::Debug for $name{
             #[allow(unreachable_patterns)]
@@ -53,14 +54,16 @@ macro_rules! fake_enum{
         }
     };
     {#[repr($t:ty)] $(#[$meta:meta])* $vis:vis enum struct $name:ident {
-        $($item:ident = $expr:literal),*$(,)?
+        $(#![$meta1:meta])*
+        $($(#[$r:meta])* $item:ident = $expr:literal),*$(,)?
     }} => {
         #[derive(Copy,Clone,Eq,PartialEq)]
         #[repr(transparent)]
         $(#[$meta])*
+        $(#[$meta1])*
         $vis struct $name($t);
         impl $name{
-            $(#[allow(non_upper_case_globals)] #[allow(dead_code)] pub const $item: $name = $name($expr as $t);)*
+            $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $(#[$r])* pub const $item: $name = $name($expr as $t);)*
         }
         impl ::std::fmt::Debug for $name{
             #[allow(unreachable_patterns)]
@@ -78,10 +81,17 @@ macro_rules! fake_enum{
 mod test {
     fake_enum! {
         #[repr(u16)] pub enum ElfType{
+            //! The type of an elf file
+
+            /// No Elf Type/Invalid Elf File
             ET_NONE = 0,
+            /// Relocatable file
             ET_REL = 1,
+            /// Executable file
             ET_EXEC = 2,
+            /// Dynamic Library/Shared Object
             ET_DYN = 3,
+            /// Core Dump
             ET_CORE = 4
         }
     }
@@ -127,11 +137,19 @@ mod test {
         #[repr(u8)]
         #[derive(Hash,Default)]
         pub enum struct NbtTagType{
+            //! The type of an Nbt Tag
+
+            /// An End Tag
             End = 0,
+            /// A byte
             Byte = 1,
+            /// A Short
             Short = 2,
+            /// An Int
             Int = 3,
+            /// A Long
             Long = 4,
+            /// A Float
             Float = 5,
             Double = 6,
             ByteArray = 7,
