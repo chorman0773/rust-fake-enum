@@ -59,7 +59,7 @@ tests =
 EXTRA_RUSTFLAGS = 
 
 # The package version
-version = 0.1.3
+version = 0.1.4
 
 # The output file of the library
 OUTPUT = fake-enum

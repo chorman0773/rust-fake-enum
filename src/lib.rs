@@ -68,11 +68,11 @@ macro_rules! fake_enum{
         impl $name{
             $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $(#[$r])* pub const $item: $name = $name($expr as $t);)*
         }
-        impl ::std::fmt::Debug for $name{
+        impl ::core::fmt::Debug for $name{
             #[allow(unreachable_patterns)]
-            fn fmt(&self,f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result{
+            fn fmt(&self,f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result{
                 match self{
-                    $(Self($expr) => f.write_str(::std::stringify!($item)),)*
+                    $(Self($expr) => f.write_str(::core::stringify!($item)),)*
                     e => f.write_fmt(::core::format_args!("{}({})",::core::stringify!($name),e.0))
                 }
             }
