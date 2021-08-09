@@ -28,9 +28,12 @@
 /// assert_eq!(format!("{:?}",x),"Bar");
 /// assert_eq!(unsafe{std::mem::transmute::<_,Foo>(1u8)},Baz)
 /// ```
+///
+/// The underlying type may be given
+
 #[macro_export]
 macro_rules! fake_enum{
-    {#[repr($t:ty)] $(#[$meta:meta])* $vis:vis enum $name:ident {
+    {#[repr($tvis:vis $t:ty)] $(#[$meta:meta])* $vis:vis enum $name:ident {
         $(#![$meta1:meta])*
         $($(#[$r:meta])* $item:ident = $expr:literal),*$(,)?
     }} => {
@@ -39,7 +42,7 @@ macro_rules! fake_enum{
         #[repr(transparent)]
         $(#[$meta])*
         $(#[$meta1])*
-        $vis struct $name($t);
+        $vis struct $name($tvis $t);
 
         $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $(#[$r])* $vis const $item: $name = $name($expr as $t);)*
 
@@ -53,7 +56,7 @@ macro_rules! fake_enum{
             }
         }
     };
-    {#[repr($t:ty)] $(#[$meta:meta])* $vis:vis enum struct $name:ident {
+    {#[repr($tvis:vis $t:ty)] $(#[$meta:meta])* $vis:vis enum struct $name:ident {
         $(#![$meta1:meta])*
         $($(#[$r:meta])* $item:ident = $expr:literal),*$(,)?
     }} => {
@@ -61,7 +64,7 @@ macro_rules! fake_enum{
         #[repr(transparent)]
         $(#[$meta])*
         $(#[$meta1])*
-        $vis struct $name($t);
+        $vis struct $name($tvis $t);
         impl $name{
             $(#[allow(non_upper_case_globals)] #[allow(dead_code)] $(#[$r])* pub const $item: $name = $name($expr as $t);)*
         }
@@ -162,5 +165,18 @@ mod test {
             DoubleArray = 14,
             Uuid = 15
         }
+    }
+
+    fake_enum! {
+        #[repr(pub u8)]
+        pub enum struct Test{
+            Foo = 0
+        }
+    }
+
+    #[test]
+    fn pub_repr_test() {
+        let foo = Test(0);
+        assert_eq!(foo, Test::Foo);
     }
 }
